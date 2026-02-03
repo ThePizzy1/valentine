@@ -164,13 +164,25 @@ setTimeout(() => {
 }, 5000);
 
 // SWEET ALERT DATA
+// SWEET ALERT DATA
 const messages = [
-  "Neeeee 💔",
-  "Krivi gumb 😅",
+  "Krivi gumb",
   "Ajde nemoj tako",
-  "Ovo je sudbina 😏",
-  "Klikni YES pls"
+  "Znam da ti mene voliš",
+  "Klikni YES",
+   "Neeeee 💔",
+  "Nemoj da ja moram doć tamo pa ćeš klikat"
 ];
+
+const emojis = [
+  "face.png",
+  "face1.png",
+  "face2.png",
+  "face3.png",
+  "face4.png",
+  "face5.png"
+];
+
 
 // NO BUTTON LOGIC
 const noBtn = document.getElementById("noBtn");
@@ -203,16 +215,25 @@ function moveNoBtn() {
   noBtn.style.left = `${x}px`;
   noBtn.style.top = `${y}px`;
 
-  tries++;
-  if (tries >= maxTries) {
-    Swal.fire({
-      title: messages[Math.floor(Math.random()*messages.length)],
-      confirmButtonText: "OK 😇",
-      background: "#2e0606",
-      color: "#ffdada"
-    });
-    tries = 0;
-  }
+tries++;
+if (tries >= maxTries) {
+  const msgIndex = Math.floor(Math.random() * messages.length);
+  const emojiIndex = Math.floor(Math.random() * emojis.length);
+
+  Swal.fire({
+    title: messages[msgIndex],
+    imageUrl: emojis[emojiIndex],
+    imageHeight: 80,
+    imageAlt: "emoji face",
+    confirmButtonText: "Ok 😊",
+    background: "#2e0606",
+    color: "#ffdada",
+    confirmButtonColor: "#7a0c14"
+  });
+
+  tries = 0;
+}
+
 }
 
 moveNoBtn();
