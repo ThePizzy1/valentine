@@ -87,7 +87,6 @@ button {
 .yes:hover { transform: scale(1.1); }
 
 .no {
-  position: fixed;
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
@@ -95,7 +94,6 @@ button {
   padding: 0.8rem 2rem;
   border-radius: 16px;
   font-size: 1rem;
-  z-index: 10;
   user-select: none;
 }
 
@@ -138,7 +136,10 @@ button {
       <button class="yes" type="submit">YES 💕</button>
     </form>
 
-    <button class="no" id="noBtn">NO 💔</button>
+    <!-- Container za NO gumb -->
+    <div id="noContainer" style="position: relative; width: 100%; height: 100%;">
+      <button id="noBtn" class="no">NO 💔</button>
+    </div>
 
     <div id="countdown">
       <span id="daysLeft">–</span>
@@ -150,7 +151,7 @@ button {
 </div>
 
 <script>
-// VIDEO SWITCH nakon 5s
+// VIDEO SWITCH
 const video = document.getElementById("bgVideo");
 setTimeout(() => {
   video.src = "valentinovo2.mp4";
@@ -170,23 +171,22 @@ const emojis = [
 ];
 
 const noBtn = document.getElementById("noBtn");
+const container = document.getElementById("noContainer");
 let clickCount = 0;
 const maxClicks = 5;
 const margin = 10;
 
-function getSafeRandom(max, size, margin){
-  return Math.random() * (max - size - 2*margin) + margin;
-}
-
+// random pozicija unutar container-a
 function moveNoBtn(){
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
-  const winW = window.innerWidth;
-  const winH = window.innerHeight;
+  const contW = container.clientWidth;
+  const contH = container.clientHeight;
 
-  const newX = getSafeRandom(winW, btnW, margin);
-  const newY = getSafeRandom(winH, btnH, margin);
+  const newX = Math.random() * (contW - btnW - 2*margin) + margin;
+  const newY = Math.random() * (contH - btnH - 2*margin) + margin;
 
+  noBtn.style.position = "absolute";
   noBtn.style.left = `${newX}px`;
   noBtn.style.top = `${newY}px`;
 
@@ -211,9 +211,7 @@ function moveNoBtn(){
 }
 
 function initNoBtn(){
-  requestAnimationFrame(() => {
-    moveNoBtn();
-  });
+  moveNoBtn(); // odmah na load
 }
 
 noBtn.addEventListener("mouseenter", moveNoBtn);
