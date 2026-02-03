@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentine ❤️</title>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <style>
@@ -12,19 +13,23 @@
   --deep: #2e0606;
   --wine: #540309;
   --text: #f5dcdc;
-  --margin: 20px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   font-family: system-ui, sans-serif;
   color: var(--text);
-  overflow: hidden;
   height: 100vh;
+  overflow: hidden;
   background: var(--dark);
 }
 
+/* VIDEO BG */
 video {
   position: fixed;
   inset: 0;
@@ -37,31 +42,36 @@ video {
 .overlay {
   position: fixed;
   inset: 0;
-  background: linear-gradient(180deg, rgba(14,6,4,0.55), rgba(46,6,6,0.75));
+  background: linear-gradient(
+    180deg,
+    rgba(14,6,4,0.55),
+    rgba(46,6,6,0.75)
+  );
   z-index: -2;
 }
 
+/* CENTER = PLAYGROUND */
 .center {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  padding: 2rem;
-  flex-direction: column;
 }
 
+/* CARD */
 .title-box {
+  position: relative;
   background: rgba(14,6,4,0.75);
   border: 1px solid var(--wine);
   backdrop-filter: blur(10px);
   padding: 3rem 3.5rem;
   border-radius: 32px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.7);
-  width: 100%;
+  text-align: center;
   max-width: 500px;
-  position: relative;
+  width: 90%;
+  z-index: 2;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
 }
 
 h1 {
@@ -70,72 +80,64 @@ h1 {
 }
 
 button {
-  padding: 1rem 2.5rem;
-  font-size: 1.2rem;
-  border-radius: 16px;
-  border: none;
   cursor: pointer;
-  transition: transform .25s ease;
+  border: none;
+  border-radius: 16px;
 }
 
+/* YES */
 .yes {
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
   background: linear-gradient(135deg, var(--wine), var(--deep));
   color: white;
   margin-bottom: 1rem;
+  transition: transform .25s ease;
 }
 
-.yes:hover { transform: scale(1.1); }
+.yes:hover {
+  transform: scale(1.1);
+}
 
-/* NO BUTTON */
+/* NO */
 .no {
+  position: absolute;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
-  cursor: pointer;
-  padding: 0.8rem 2rem;
-  border-radius: 16px;
-  font-size: 1rem;
   user-select: none;
-  position: absolute; /* da može skačiti unutar boxa */
-  transition: left 0.3s ease, top 0.3s ease; /* glatko kretanje */
+  transition: left 0.25s ease, top 0.25s ease;
+  z-index: 1;
 }
 
-/* COUNTDOWN horizontal */
+/* COUNTDOWN */
 #countdown {
-  background: rgba(14,6,4,0.85);
-  border: 1px solid var(--wine);
-  padding: 0.8rem 1rem;
-  border-radius: 16px;
-  text-align: center;
   margin-top: 1.5rem;
-  font-size: 1rem;
   display: flex;
   gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
+  font-size: 1rem;
 }
 #countdown span { font-weight: bold; }
-
-@media(max-width:600px){
-  .center { padding: 1rem; }
-  .title-box { padding: 2rem 2rem; }
-  #countdown { width: 100%; max-width: 400px; }
-}
 </style>
 </head>
+
 <body>
 
 <video id="bgVideo" autoplay muted playsinline>
   <source src="valentinovo.mp4" type="video/mp4">
 </video>
-<div class="overlay">
+<div class="overlay"></div>
+
 <div class="center" id="playground">
 
   <div class="title-box" id="titleBox">
     <h1>Gabi,<br>will you be my Valentine? ❤️</h1>
 
     <form action="https://formspree.io/f/xpqlnyqo" method="POST">
-      <input type="hidden" name="message" value="test">
+      <input type="hidden" name="message" value="YES 💍">
       <button class="yes" type="submit">YES 💕</button>
     </form>
 
@@ -147,10 +149,8 @@ button {
     </div>
   </div>
 
-  <!-- NO JE IZVAN TITLE-BOXA -->
+  <!-- NO BUTTON (IZVAN BOXA, ALI UNUTAR CENTRA) -->
   <button id="noBtn" class="no">NO 💔</button>
-
-</div>
 
 </div>
 
@@ -163,64 +163,43 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-// SWEETALERT2 NO BUTTON
-const messages = ["Neeeee 💔","WTF Gabi","Stop pls!","Krivi gumb!","Ne mogu više","Klikni YESS!"];
-const emojis = [
-  "face.png",
-  "face1.png",
-  "face2.png",
-  "face3.png",
-  "face4.png",
-  "face5.png"
-];
-
+// NO BUTTON LOGIC
 const noBtn = document.getElementById("noBtn");
-const box = document.querySelector(".title-box"); // granice za button
-let clickCount = 0;
-const maxClicks = 5;
+const center = document.getElementById("playground");
+const box = document.getElementById("titleBox");
 const margin = 10;
 
-function moveNoBtn(){
+function moveNoBtn() {
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
-  const boxW = box.clientWidth;
-  const boxH = box.clientHeight;
 
-  const newX = Math.random() * (boxW - btnW - 2*margin) + margin;
-  const newY = Math.random() * (boxH - btnH - 2*margin) + margin;
+  const c = center.getBoundingClientRect();
+  const b = box.getBoundingClientRect();
 
-  noBtn.style.left = `${newX}px`;
-  noBtn.style.top = `${newY}px`;
+  let x, y;
+  let safe = false;
 
-  clickCount++;
-  if(clickCount >= maxClicks){
-    const msgIndex = Math.floor(Math.random()*messages.length);
-    const emojiIndex = Math.floor(Math.random()*emojis.length);
+  while (!safe) {
+    x = Math.random() * (c.width - btnW - 2 * margin) + margin;
+    y = Math.random() * (c.height - btnH - 2 * margin) + margin;
 
-    Swal.fire({
-      title: messages[msgIndex],
-      imageUrl: emojis[emojiIndex],
-      imageHeight: 80,
-      imageAlt: "emoji face",
-      showConfirmButton: true,
-      confirmButtonText: "Ok 😊",
-      background: '#2e0606',
-      color: '#ffdada'
-    });
+    const overlap =
+      x + btnW > b.left - c.left &&
+      x < b.right - c.left &&
+      y + btnH > b.top - c.top &&
+      y < b.bottom - c.top;
 
-    clickCount = 0;
+    if (!overlap) safe = true;
   }
+
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
 }
 
-function initNoBtn(){
-  moveNoBtn(); // odmah na load
-}
-
+moveNoBtn();
 noBtn.addEventListener("mouseenter", moveNoBtn);
 noBtn.addEventListener("click", moveNoBtn);
 noBtn.addEventListener("touchstart", moveNoBtn);
-window.addEventListener("load", initNoBtn);
-window.addEventListener("resize", initNoBtn);
 
 // COUNTDOWN
 const daysLeft = document.getElementById("daysLeft");
@@ -228,32 +207,32 @@ const cdHours = document.getElementById("cdHours");
 const cdMinutes = document.getElementById("cdMinutes");
 const cdSeconds = document.getElementById("cdSeconds");
 
-function updateCountdown(){
+function updateCountdown() {
   const now = new Date();
-  const target = new Date(now.getFullYear(),1,14,0,0,0); // Feb 14
-  let diff = target - now;
+  const target = new Date(now.getFullYear(), 1, 14);
+  const diff = target - now;
 
-  if(diff<0){
+  if (diff < 0) {
     daysLeft.textContent = "❤️";
-    cdHours.textContent = '';
-    cdMinutes.textContent = '';
-    cdSeconds.textContent = '';
+    cdHours.textContent = "";
+    cdMinutes.textContent = "";
+    cdSeconds.textContent = "";
     return;
   }
 
-  const days = Math.floor(diff/(1000*60*60*24));
-  const hours = Math.floor((diff/(1000*60*60))%24);
-  const mins = Math.floor((diff/(1000*60))%60);
-  const secs = Math.floor((diff/1000)%60);
+  const d = Math.floor(diff / (1000*60*60*24));
+  const h = Math.floor((diff / (1000*60*60)) % 24);
+  const m = Math.floor((diff / (1000*60)) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
-  daysLeft.textContent = `${days}d`;
-  cdHours.textContent = `${hours}h`;
-  cdMinutes.textContent = `${mins}m`;
-  cdSeconds.textContent = `${secs}s`;
+  daysLeft.textContent = `${d}d`;
+  cdHours.textContent = `${h}h`;
+  cdMinutes.textContent = `${m}m`;
+  cdSeconds.textContent = `${s}s`;
 }
 
 updateCountdown();
-setInterval(updateCountdown,1000);
+setInterval(updateCountdown, 1000);
 </script>
 
 </body>
