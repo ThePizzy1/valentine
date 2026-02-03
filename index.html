@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Valentine ❤️</title>
-
 <style>
 :root {
   --dark: #0e0604;
@@ -97,6 +96,9 @@ button {
   background: rgba(255,255,255,.15);
   color: white;
   border: 1px solid var(--wine);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* COUNTDOWN – SIDE */
@@ -124,16 +126,30 @@ button {
   font-size: .9rem;
   color: #f0bcbc;
 }
+
+/* COUNTDOWN MOBILE LAYOUT */
+@media (max-width: 600px) {
+  .countdown {
+    right: 50%;
+    top: auto;
+    bottom: 2rem;
+    transform: translateX(50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .countdown span, .countdown small {
+    text-align: center;
+  }
+}
 </style>
 </head>
-
 <body>
 
 <!-- VIDEO -->
 <video id="bgVideo" autoplay muted playsinline>
   <source src="valentinovo.mp4" type="video/mp4">
 </video>
-
 <div class="overlay"></div>
 
 <!-- CENTER CONTENT -->
@@ -159,38 +175,53 @@ button {
 <script>
 /* SWITCH VIDEO AFTER 5s */
 const video = document.getElementById("bgVideo");
-
 setTimeout(() => {
   video.src = "valentinovo2.mp4";
   video.loop = true;
   video.play();
 }, 5000);
 
-/* NO BUTTON MOVE (DOES NOT REMOVE ANYTHING) */
+/* NO BUTTON MOVE + WARNING */
 const noBtn = document.getElementById("noBtn");
+let hoverCount = 0;
+
 function moveButton() {
-  noBtn.style.left = Math.random() * (window.innerWidth - 120) + "px";
-  noBtn.style.top = Math.random() * (window.innerHeight - 60) + "px";
+  hoverCount++;
+
+  // svaki 5. put alert
+  if (hoverCount % 5 === 0) {
+    alert("Are you sure? 💔");
+  }
+
+  // random pozicija
+  const btnWidth = noBtn.offsetWidth;
+  const btnHeight = noBtn.offsetHeight;
+  const maxX = window.innerWidth - btnWidth;
+  const maxY = window.innerHeight - btnHeight;
+  
+  noBtn.style.left = Math.random() * maxX + "px";
+  noBtn.style.top = Math.random() * maxY + "px";
 }
+
+// eventovi za desktop i mobil
 noBtn.addEventListener("mouseenter", moveButton);
 noBtn.addEventListener("touchstart", moveButton);
+noBtn.addEventListener("click", moveButton);
 
 /* FORM SUBMIT */
 document.getElementById("valentineForm").addEventListener("submit", e => {
   e.preventDefault();
-
   fetch("https://formspree.io/f/xpqlnyqo", {
     method: "POST",
     headers: { "Accept": "application/json" },
     body: new FormData(e.target)
   });
-
   alert("I knew you love me ❤️");
 });
 
 /* COUNTDOWN */
 const countdown = document.getElementById("countdown");
-const valentines = new Date(new Date().getFullYear(), 1, 14);
+const valentines = new Date(new Date().getFullYear(), 1, 14); // 14 Feb
 
 function updateCountdown() {
   const now = new Date();
@@ -209,7 +240,5 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 60000);
 </script>
-
 </body>
 </html>
-
