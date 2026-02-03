@@ -63,6 +63,7 @@ video {
   box-shadow: 0 30px 80px rgba(0,0,0,.7);
   width: 100%;
   max-width: 400px;
+  position: relative;
 }
 
 h1 {
@@ -95,6 +96,11 @@ button {
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
+  cursor: pointer;
+  padding: 0.8rem 2rem;
+  border-radius: 16px;
+  font-size: 1rem;
+  z-index: 2;
 }
 
 /* COUNTDOWN */
@@ -110,6 +116,8 @@ button {
 
 #countdown span {
   font-weight: bold;
+  display: block;
+  margin: 0.2rem 0;
 }
 
 /* MOBILE LAYOUT */
@@ -166,26 +174,47 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-/* NO BUTTON ALWAYS VISIBLE */
+/* NO BUTTON ALWAYS VISIBLE I UNUTAR SIGURNOG KRUGA */
 const noBtn = document.getElementById("noBtn");
-const padding = 10;
+const box = document.querySelector(".title-box");
 
 function moveButton() {
-  const w = noBtn.offsetWidth;
-  const h = noBtn.offsetHeight;
-  const maxX = window.innerWidth - w - padding;
-  const maxY = window.innerHeight - h - padding;
+  const boxRect = box.getBoundingClientRect();
+  const btnW = noBtn.offsetWidth;
+  const btnH = noBtn.offsetHeight;
 
-  const newX = Math.random() * maxX;
-  const newY = Math.random() * maxY;
+  // definiramo sigurni krug oko centra diva
+  const centerX = boxRect.left + boxRect.width / 2;
+  const centerY = boxRect.top + boxRect.height / 2;
+  const radiusX = boxRect.width / 2 + 50; // koliko se horizontalno može micati
+  const radiusY = boxRect.height / 2 + 50; // koliko se vertikalno može micati
+
+  // nasumična pozicija unutar kruga
+  const angle = Math.random() * 2 * Math.PI;
+  const rX = Math.random() * radiusX;
+  const rY = Math.random() * radiusY;
+  let newX = centerX + rX * Math.cos(angle) - btnW/2;
+  let newY = centerY + rY * Math.sin(angle) - btnH/2;
+
+  // provjera da ne izlazi iz ekrana
+  newX = Math.min(Math.max(10, newX), window.innerWidth - btnW - 10);
+  newY = Math.min(Math.max(10, newY), window.innerHeight - btnH - 10);
 
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
 }
 
+// eventi za desktop i mobitel
 noBtn.addEventListener("mouseenter", moveButton);
 noBtn.addEventListener("touchstart", moveButton);
 noBtn.addEventListener("click", moveButton);
+
+// početna pozicija u centru
+window.addEventListener("load", () => {
+  const boxRect = box.getBoundingClientRect();
+  noBtn.style.left = (boxRect.left + boxRect.width/2 - noBtn.offsetWidth/2) + "px";
+  noBtn.style.top = (boxRect.top + boxRect.height/2 - noBtn.offsetHeight/2) + "px";
+});
 
 /* COUNTDOWN */
 const daysLeft = document.getElementById("daysLeft");
