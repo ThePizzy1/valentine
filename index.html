@@ -86,7 +86,7 @@ button {
 .yes:hover { transform: scale(1.1); }
 
 .no {
-  position: absolute;
+  position: fixed; /* uvijek vidljiv */
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
@@ -94,7 +94,8 @@ button {
   padding: 0.8rem 2rem;
   border-radius: 16px;
   font-size: 1rem;
-  z-index: 2;
+  z-index: 10;
+  user-select: none;
 }
 
 /* COUNTDOWN horizontal */
@@ -158,28 +159,29 @@ setTimeout(() => {
 
 // NO BUTTON LOGIC
 const noBtn = document.getElementById("noBtn");
-const box = document.querySelector(".title-box");
 const margin = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--margin'));
 let hoverCount = 0;
 
-// Emojis for alerts (replace with your uploaded PNGs as needed)
+// Emoji slike i poruke
 const emojis = [
-  '/mnt/data/dbc83ab7-2d19-46ad-a08d-f5d499d244c4.png', // face5.png
-  'face4.png',
-  'face3.png',
-  'face2.png',
   'face1.png',
+  'face2.png',
+  'face3.png',
+  'face4.png',
+  'face5.png',
   'face.png'
 ];
 const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅","Ups 😎"];
 
 function showAlert(){
+  if(Swal.isVisible()) return; // ne otvaraj novi ako je alert već otvoren
   const msgIndex = Math.floor(Math.random()*messages.length);
   const emojiIndex = Math.floor(Math.random()*emojis.length);
   Swal.fire({
     title: messages[msgIndex],
     imageUrl: emojis[emojiIndex],
     imageHeight: 64,
+    imageAlt: "emoji face",
     showConfirmButton: true,
     confirmButtonText: "Ok 😊",
     background: '#2e0606',
@@ -196,7 +198,7 @@ function moveButton(){
   const winW = window.innerWidth;
   const winH = window.innerHeight;
 
-  // random position inside screen with margin
+  // random pozicija unutar ekrana s marginom
   const newX = Math.random() * (winW - btnW - 2*margin) + margin;
   const newY = Math.random() * (winH - btnH - 2*margin) + margin;
 
@@ -204,7 +206,7 @@ function moveButton(){
   noBtn.style.top = `${newY}px`;
 }
 
-// Ensure NO button is always visible at start
+// Postavi početnu poziciju NO gumba
 function initNoBtnPosition(){
   const winW = window.innerWidth;
   const winH = window.innerHeight;
