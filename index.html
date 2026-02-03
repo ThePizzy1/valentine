@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valentine ❤️</title>
-
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <style>
@@ -14,6 +12,7 @@
   --deep: #2e0606;
   --wine: #540309;
   --text: #f5dcdc;
+  --margin: 20px; /* margin from screen edge */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -41,7 +40,6 @@ video {
   z-index: -2;
 }
 
-/* CENTER CONTENT */
 .center {
   position: absolute;
   inset: 0;
@@ -70,7 +68,6 @@ h1 {
   margin-bottom: 2rem;
 }
 
-/* BUTTONS */
 button {
   padding: 1rem 2.5rem;
   font-size: 1.2rem;
@@ -86,9 +83,7 @@ button {
   margin-bottom: 1rem;
 }
 
-.yes:hover {
-  transform: scale(1.1);
-}
+.yes:hover { transform: scale(1.1); }
 
 .no {
   position: absolute;
@@ -102,7 +97,7 @@ button {
   z-index: 2;
 }
 
-/* COUNTDOWN */
+/* COUNTDOWN horizontal */
 #countdown {
   background: rgba(14,6,4,0.85);
   border: 1px solid var(--wine);
@@ -111,29 +106,17 @@ button {
   text-align: center;
   margin-top: 1.5rem;
   font-size: 1rem;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
+#countdown span { font-weight: bold; }
 
-#countdown span {
-  font-weight: bold;
-  display: block;
-  margin: 0.2rem 0;
-}
-
-/* MOBILE LAYOUT */
 @media(max-width:600px){
-  .center {
-    padding: 1rem;
-  }
-
-  .title-box {
-    padding: 2rem 2rem;
-  }
-
-  #countdown {
-    width: 100%;
-    max-width: 400px;
-    margin-top: 1rem;
-  }
+  .center { padding: 1rem; }
+  .title-box { padding: 2rem 2rem; }
+  #countdown { width: 100%; max-width: 400px; }
 }
 </style>
 </head>
@@ -156,16 +139,16 @@ button {
     <button class="no" id="noBtn">NO 💔</button>
 
     <div id="countdown">
-      <span id="daysLeft">–</span> 
-      <span id="cdHours"></span> 
-      <span id="cdMinutes"></span> 
+      <span id="daysLeft">–</span>
+      <span id="cdHours"></span>
+      <span id="cdMinutes"></span>
       <span id="cdSeconds"></span>
     </div>
   </div>
 </div>
 
 <script>
-/* VIDEO SWITCH */
+// VIDEO SWITCH
 const video = document.getElementById("bgVideo");
 setTimeout(() => {
   video.src = "valentinovo2.mp4";
@@ -173,59 +156,72 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-/* NO BUTTON FUN + ALERTS */
+// NO BUTTON LOGIC
 const noBtn = document.getElementById("noBtn");
 const box = document.querySelector(".title-box");
+const margin = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--margin'));
 let hoverCount = 0;
-const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅"];
 
-function moveButton() {
+// Emojis for alerts (replace with your uploaded PNGs as needed)
+const emojis = [
+  '/mnt/data/dbc83ab7-2d19-46ad-a08d-f5d499d244c4.png', // face5.png
+  'face4.png',
+  'face3.png',
+  'face2.png',
+  'face1.png',
+  'face.png'
+];
+const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅","Ups 😎"];
+
+function showAlert(){
+  const msgIndex = Math.floor(Math.random()*messages.length);
+  const emojiIndex = Math.floor(Math.random()*emojis.length);
+  Swal.fire({
+    title: messages[msgIndex],
+    imageUrl: emojis[emojiIndex],
+    imageHeight: 64,
+    showConfirmButton: true,
+    confirmButtonText: "Ok 😊",
+    background: '#2e0606',
+    color: '#ffdada'
+  });
+}
+
+function moveButton(){
   hoverCount++;
-
-  // poruka svakih 5 pokušaja
-  if(hoverCount % 5 === 0){
-    const msgIndex = Math.floor(Math.random()*messages.length);
-    Swal.fire({
-      title: messages[msgIndex],
-      showConfirmButton: true,
-      confirmButtonText: "Ok 😊",
-      background: '#2e0606',
-      color: '#ffdada',
-      icon: null
-    });
-  }
+  if(hoverCount % 5 === 0) showAlert();
 
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
-  const padding = 10;
+  const winW = window.innerWidth;
+  const winH = window.innerHeight;
 
-  // sigurni prostor oko centra diva, ne izlazi iz ekrana
-  const boxRect = box.getBoundingClientRect();
-  const safeLeft = Math.max(0, boxRect.left - btnW - padding);
-  const safeRight = Math.min(window.innerWidth - btnW, boxRect.right + btnW + padding);
-  const safeTop = Math.max(0, boxRect.top - btnH - padding);
-  const safeBottom = Math.min(window.innerHeight - btnH, boxRect.bottom + btnH + padding);
+  // random position inside screen with margin
+  const newX = Math.random() * (winW - btnW - 2*margin) + margin;
+  const newY = Math.random() * (winH - btnH - 2*margin) + margin;
 
-  const newX = Math.random() * (safeRight - safeLeft) + safeLeft;
-  const newY = Math.random() * (safeBottom - safeTop) + safeTop;
-
-  noBtn.style.left = newX + "px";
-  noBtn.style.top = newY + "px";
+  noBtn.style.left = `${newX}px`;
+  noBtn.style.top = `${newY}px`;
 }
 
-// event listeneri
+// Ensure NO button is always visible at start
+function initNoBtnPosition(){
+  const winW = window.innerWidth;
+  const winH = window.innerHeight;
+  const btnW = noBtn.offsetWidth;
+  const btnH = noBtn.offsetHeight;
+  noBtn.style.left = `${winW - btnW - margin}px`;
+  noBtn.style.top = `${margin}px`;
+}
+
 noBtn.addEventListener("mouseenter", moveButton);
 noBtn.addEventListener("touchstart", moveButton);
 noBtn.addEventListener("click", moveButton);
 
-// početna pozicija u centru
-window.addEventListener("load", () => {
-  const boxRect = box.getBoundingClientRect();
-  noBtn.style.left = (boxRect.left + boxRect.width/2 - noBtn.offsetWidth/2) + "px";
-  noBtn.style.top = (boxRect.top + boxRect.height/2 - noBtn.offsetHeight/2) + "px";
-});
+window.addEventListener("load", initNoBtnPosition);
+window.addEventListener("resize", initNoBtnPosition);
 
-/* COUNTDOWN */
+// COUNTDOWN horizontal
 const daysLeft = document.getElementById("daysLeft");
 const cdHours = document.getElementById("cdHours");
 const cdMinutes = document.getElementById("cdMinutes");
@@ -249,14 +245,14 @@ function updateCountdown(){
   const mins = Math.floor((diff/(1000*60))%60);
   const secs = Math.floor((diff/1000)%60);
 
-  daysLeft.textContent = days + " days";
-  cdHours.textContent = hours + " hours";
-  cdMinutes.textContent = mins + " minutes";
-  cdSeconds.textContent = secs + " seconds";
+  daysLeft.textContent = `${days}d`;
+  cdHours.textContent = `${hours}h`;
+  cdMinutes.textContent = `${mins}m`;
+  cdSeconds.textContent = `${secs}s`;
 }
 
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
 </script>
 
 </body>
