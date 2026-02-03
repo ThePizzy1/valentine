@@ -15,11 +15,7 @@
   --text: #f5dcdc;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: system-ui, sans-serif;
@@ -29,7 +25,7 @@ body {
   background: var(--dark);
 }
 
-/* VIDEO BG */
+/* VIDEO */
 video {
   position: fixed;
   inset: 0;
@@ -42,15 +38,11 @@ video {
 .overlay {
   position: fixed;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(14,6,4,0.55),
-    rgba(46,6,6,0.75)
-  );
+  background: linear-gradient(180deg, rgba(14,6,4,0.55), rgba(46,6,6,0.75));
   z-index: -2;
 }
 
-/* CENTER = PLAYGROUND */
+/* PLAYGROUND */
 .center {
   position: relative;
   height: 100vh;
@@ -61,7 +53,6 @@ video {
 
 /* CARD */
 .title-box {
-  position: relative;
   background: rgba(14,6,4,0.75);
   border: 1px solid var(--wine);
   backdrop-filter: blur(10px);
@@ -79,37 +70,47 @@ h1 {
   margin-bottom: 2rem;
 }
 
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 16px;
-}
-
 /* YES */
 .yes {
   padding: 1rem 2.5rem;
   font-size: 1.2rem;
-  background: linear-gradient(135deg, var(--wine), var(--deep));
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7a0c14, #2e0606);
   color: white;
+  cursor: pointer;
   margin-bottom: 1rem;
-  transition: transform .25s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .yes:hover {
   transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(255,80,100,.5);
 }
 
-/* NO */
+/* NO – SAD SE STVARNO VIDI */
 .no {
   position: absolute;
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1px solid var(--wine);
+  padding: 0.9rem 2.2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ffffff, #ffbaba);
+  color: #3a0505;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
   user-select: none;
-  transition: left 0.25s ease, top 0.25s ease;
   z-index: 1;
+  box-shadow:
+    0 0 15px rgba(255,120,120,.8),
+    0 0 40px rgba(255,50,50,.4);
+  animation: pulse 2s infinite;
+  transition: left .25s ease, top .25s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
 /* COUNTDOWN */
@@ -149,7 +150,6 @@ button {
     </div>
   </div>
 
-  <!-- NO BUTTON (IZVAN BOXA, ALI UNUTAR CENTRA) -->
   <button id="noBtn" class="no">NO 💔</button>
 
 </div>
@@ -163,37 +163,56 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
+// SWEET ALERT DATA
+const messages = [
+  "Neeeee 💔",
+  "Krivi gumb 😅",
+  "Ajde nemoj tako",
+  "Ovo je sudbina 😏",
+  "Klikni YES pls"
+];
+
 // NO BUTTON LOGIC
 const noBtn = document.getElementById("noBtn");
 const center = document.getElementById("playground");
 const box = document.getElementById("titleBox");
+
+let tries = 0;
+const maxTries = 4;
 const margin = 10;
 
 function moveNoBtn() {
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
-
   const c = center.getBoundingClientRect();
   const b = box.getBoundingClientRect();
 
-  let x, y;
-  let safe = false;
+  let x, y, overlap;
 
-  while (!safe) {
-    x = Math.random() * (c.width - btnW - 2 * margin) + margin;
-    y = Math.random() * (c.height - btnH - 2 * margin) + margin;
+  do {
+    x = Math.random() * (c.width - btnW - 2*margin) + margin;
+    y = Math.random() * (c.height - btnH - 2*margin) + margin;
 
-    const overlap =
+    overlap =
       x + btnW > b.left - c.left &&
       x < b.right - c.left &&
       y + btnH > b.top - c.top &&
       y < b.bottom - c.top;
-
-    if (!overlap) safe = true;
-  }
+  } while (overlap);
 
   noBtn.style.left = `${x}px`;
   noBtn.style.top = `${y}px`;
+
+  tries++;
+  if (tries >= maxTries) {
+    Swal.fire({
+      title: messages[Math.floor(Math.random()*messages.length)],
+      confirmButtonText: "OK 😇",
+      background: "#2e0606",
+      color: "#ffdada"
+    });
+    tries = 0;
+  }
 }
 
 moveNoBtn();
@@ -214,21 +233,14 @@ function updateCountdown() {
 
   if (diff < 0) {
     daysLeft.textContent = "❤️";
-    cdHours.textContent = "";
-    cdMinutes.textContent = "";
-    cdSeconds.textContent = "";
+    cdHours.textContent = cdMinutes.textContent = cdSeconds.textContent = "";
     return;
   }
 
-  const d = Math.floor(diff / (1000*60*60*24));
-  const h = Math.floor((diff / (1000*60*60)) % 24);
-  const m = Math.floor((diff / (1000*60)) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-
-  daysLeft.textContent = `${d}d`;
-  cdHours.textContent = `${h}h`;
-  cdMinutes.textContent = `${m}m`;
-  cdSeconds.textContent = `${s}s`;
+  daysLeft.textContent = Math.floor(diff / 86400000) + "d";
+  cdHours.textContent = Math.floor(diff / 3600000 % 24) + "h";
+  cdMinutes.textContent = Math.floor(diff / 60000 % 60) + "m";
+  cdSeconds.textContent = Math.floor(diff / 1000 % 60) + "s";
 }
 
 updateCountdown();
@@ -237,3 +249,4 @@ setInterval(updateCountdown, 1000);
 
 </body>
 </html>
+
