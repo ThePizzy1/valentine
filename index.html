@@ -25,7 +25,6 @@ body {
   background: var(--dark);
 }
 
-/* VIDEO */
 video {
   position: fixed;
   inset: 0;
@@ -62,13 +61,13 @@ video {
   border-radius: 32px;
   box-shadow: 0 30px 80px rgba(0,0,0,.7);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   position: relative;
 }
 
 h1 {
   font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 /* BUTTONS */
@@ -174,37 +173,47 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-/* NO BUTTON ALWAYS VISIBLE I UNUTAR SIGURNOG KRUGA */
+/* NO BUTTON FUN + ALERTS */
 const noBtn = document.getElementById("noBtn");
 const box = document.querySelector(".title-box");
+let hoverCount = 0;
+const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅"];
 
 function moveButton() {
-  const boxRect = box.getBoundingClientRect();
+  hoverCount++;
+
+  // poruka svakih 5 pokušaja
+  if(hoverCount % 5 === 0){
+    const msgIndex = Math.floor(Math.random()*messages.length);
+    Swal.fire({
+      title: messages[msgIndex],
+      showConfirmButton: true,
+      confirmButtonText: "Ok 😊",
+      background: '#2e0606',
+      color: '#ffdada',
+      icon: null
+    });
+  }
+
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
+  const padding = 10;
 
-  // definiramo sigurni krug oko centra diva
-  const centerX = boxRect.left + boxRect.width / 2;
-  const centerY = boxRect.top + boxRect.height / 2;
-  const radiusX = boxRect.width / 2 + 50; // koliko se horizontalno može micati
-  const radiusY = boxRect.height / 2 + 50; // koliko se vertikalno može micati
+  // sigurni prostor oko centra diva, ne izlazi iz ekrana
+  const boxRect = box.getBoundingClientRect();
+  const safeLeft = Math.max(0, boxRect.left - btnW - padding);
+  const safeRight = Math.min(window.innerWidth - btnW, boxRect.right + btnW + padding);
+  const safeTop = Math.max(0, boxRect.top - btnH - padding);
+  const safeBottom = Math.min(window.innerHeight - btnH, boxRect.bottom + btnH + padding);
 
-  // nasumična pozicija unutar kruga
-  const angle = Math.random() * 2 * Math.PI;
-  const rX = Math.random() * radiusX;
-  const rY = Math.random() * radiusY;
-  let newX = centerX + rX * Math.cos(angle) - btnW/2;
-  let newY = centerY + rY * Math.sin(angle) - btnH/2;
-
-  // provjera da ne izlazi iz ekrana
-  newX = Math.min(Math.max(10, newX), window.innerWidth - btnW - 10);
-  newY = Math.min(Math.max(10, newY), window.innerHeight - btnH - 10);
+  const newX = Math.random() * (safeRight - safeLeft) + safeLeft;
+  const newY = Math.random() * (safeBottom - safeTop) + safeTop;
 
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
 }
 
-// eventi za desktop i mobitel
+// event listeneri
 noBtn.addEventListener("mouseenter", moveButton);
 noBtn.addEventListener("touchstart", moveButton);
 noBtn.addEventListener("click", moveButton);
