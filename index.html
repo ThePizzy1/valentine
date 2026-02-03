@@ -86,6 +86,7 @@ button {
 
 .yes:hover { transform: scale(1.1); }
 
+/* NO BUTTON */
 .no {
   background: rgba(255,255,255,0.15);
   color: white;
@@ -95,6 +96,8 @@ button {
   border-radius: 16px;
   font-size: 1rem;
   user-select: none;
+  position: absolute; /* da može skačiti unutar boxa */
+  transition: left 0.3s ease, top 0.3s ease; /* glatko kretanje */
 }
 
 /* COUNTDOWN horizontal */
@@ -146,8 +149,6 @@ button {
   </div>
       <button id="noBtn" class="no">NO 💔</button>
     </div>
-
-   
 </div>
 
 <script>
@@ -171,22 +172,20 @@ const emojis = [
 ];
 
 const noBtn = document.getElementById("noBtn");
-const container = document.getElementById("noContainer");
+const box = document.querySelector(".title-box"); // granice za button
 let clickCount = 0;
 const maxClicks = 5;
 const margin = 10;
 
-// random pozicija unutar container-a
 function moveNoBtn(){
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
-  const contW = container.clientWidth;
-  const contH = container.clientHeight;
+  const boxW = box.clientWidth;
+  const boxH = box.clientHeight;
 
-  const newX = Math.random() * (contW - btnW - 2*margin) + margin;
-  const newY = Math.random() * (contH - btnH - 2*margin) + margin;
+  const newX = Math.random() * (boxW - btnW - 2*margin) + margin;
+  const newY = Math.random() * (boxH - btnH - 2*margin) + margin;
 
-  noBtn.style.position = "absolute";
   noBtn.style.left = `${newX}px`;
   noBtn.style.top = `${newY}px`;
 
