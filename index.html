@@ -22,6 +22,7 @@ body {
   color: var(--text);
   overflow: hidden;
   height: 100vh;
+  background: var(--dark);
 }
 
 /* VIDEO */
@@ -50,6 +51,7 @@ video {
   align-items: center;
   text-align: center;
   padding: 2rem;
+  flex-direction: column;
 }
 
 .title-box {
@@ -59,6 +61,8 @@ video {
   padding: 3rem 3.5rem;
   border-radius: 32px;
   box-shadow: 0 30px 80px rgba(0,0,0,.7);
+  width: 100%;
+  max-width: 400px;
 }
 
 h1 {
@@ -87,46 +91,41 @@ button {
 }
 
 .no {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
-  z-index: 10;
 }
 
 /* COUNTDOWN */
 #countdown {
-  position: fixed;
-  right: 2rem;
-  top: 2rem;
   background: rgba(14,6,4,0.85);
   border: 1px solid var(--wine);
-  padding: 1rem 1.5rem;
-  border-radius: 20px;
+  padding: 0.8rem 1rem;
+  border-radius: 16px;
   text-align: center;
+  margin-top: 1.5rem;
+  font-size: 1rem;
 }
 
 #countdown span {
-  font-size: 2rem;
   font-weight: bold;
-  display: block;
-}
-
-#countdown div {
-  margin-top: 0.3rem;
-  font-size: 1rem;
-  line-height: 1.3;
 }
 
 /* MOBILE LAYOUT */
 @media(max-width:600px){
+  .center {
+    padding: 1rem;
+  }
+
+  .title-box {
+    padding: 2rem 2rem;
+  }
+
   #countdown {
-    right: 1rem;
-    top: auto;
-    bottom: 1rem;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 1rem;
   }
 }
 </style>
@@ -148,15 +147,14 @@ button {
     </form>
 
     <button class="no" id="noBtn">NO 💔</button>
-  </div>
-</div>
 
-<div id="countdown">
-  <span id="daysLeft">–</span>
-  <div id="cdDays"></div>
-  <div id="cdHours"></div>
-  <div id="cdMinutes"></div>
-  <div id="cdSeconds"></div>
+    <div id="countdown">
+      <span id="daysLeft">–</span> 
+      <span id="cdHours"></span> 
+      <span id="cdMinutes"></span> 
+      <span id="cdSeconds"></span>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -168,37 +166,18 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-/* NO BUTTON MOVE + FUN ALERTS */
+/* NO BUTTON ALWAYS VISIBLE */
 const noBtn = document.getElementById("noBtn");
-let hoverCount = 0;
-const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅"];
+const padding = 10;
 
 function moveButton() {
-  hoverCount++;
-
-  // poruka svakih 5 pokušaja
-  if(hoverCount % 5 === 0){
-    const msgIndex = Math.floor(Math.random()*messages.length);
-    Swal.fire({
-      title: messages[msgIndex],
-      showConfirmButton: true,
-      confirmButtonText: "Ok 😊",
-      background: '#2e0606',
-      color: '#ffdada',
-      icon: null
-    });
-  }
-
-  const padding = 10; // minimalni razmak od ruba
   const w = noBtn.offsetWidth;
   const h = noBtn.offsetHeight;
   const maxX = window.innerWidth - w - padding;
   const maxY = window.innerHeight - h - padding;
-  const minX = padding;
-  const minY = padding;
 
-  const newX = Math.random() * (maxX - minX) + minX;
-  const newY = Math.random() * (maxY - minY) + minY;
+  const newX = Math.random() * maxX;
+  const newY = Math.random() * maxY;
 
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
@@ -210,7 +189,6 @@ noBtn.addEventListener("click", moveButton);
 
 /* COUNTDOWN */
 const daysLeft = document.getElementById("daysLeft");
-const cdDays = document.getElementById("cdDays");
 const cdHours = document.getElementById("cdHours");
 const cdMinutes = document.getElementById("cdMinutes");
 const cdSeconds = document.getElementById("cdSeconds");
@@ -222,7 +200,6 @@ function updateCountdown(){
 
   if(diff<0){
     daysLeft.textContent = "❤️";
-    cdDays.textContent = '';
     cdHours.textContent = '';
     cdMinutes.textContent = '';
     cdSeconds.textContent = '';
@@ -235,7 +212,6 @@ function updateCountdown(){
   const secs = Math.floor((diff/1000)%60);
 
   daysLeft.textContent = days + " days";
-  cdDays.textContent = days + " days";
   cdHours.textContent = hours + " hours";
   cdMinutes.textContent = mins + " minutes";
   cdSeconds.textContent = secs + " seconds";
