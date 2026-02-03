@@ -1,72 +1,168 @@
 <!DOCTYPE html>
-<html lang="hr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Will you be my Valentine? 💘</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Will you be my Valentine? ❤️</title>
 
 <style>
+:root {
+  --dark: #0e0604;
+  --deep: #2e0606;
+  --wine: #540309;
+  --text: #f7dede;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   font-family: system-ui, sans-serif;
+  overflow: hidden;
+  color: var(--text);
 }
 
+/* VIDEO BACKGROUND */
+.bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -3;
+}
+
+/* DARK OVERLAY */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(14,6,4,0.6),
+    rgba(46,6,6,0.75)
+  );
+  z-index: -2;
+}
+
+/* CARD */
 .card {
-  background: white;
-  padding: 2rem;
-  border-radius: 24px;
+  background: rgba(14,6,4,0.8);
+  border: 1px solid var(--wine);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 30px;
   text-align: center;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.2);
+  max-width: 420px;
+  margin: auto;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
 }
 
+/* TITLE */
 h1 {
+  margin-bottom: 1.5rem;
+  color: #ffdada;
+}
+
+/* COUNTDOWN */
+#countdown {
   margin-bottom: 2rem;
+  font-size: 1.1rem;
+  color: #f1bcbc;
 }
 
+/* BUTTONS */
 button {
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   font-size: 1.2rem;
+  border-radius: 16px;
   border: none;
-  border-radius: 12px;
   cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* YES BUTTON – POPUP / PULSE */
 .yes {
-  background: #ff4d6d;
+  background: linear-gradient(135deg, var(--wine), var(--deep));
   color: white;
+  box-shadow: 0 15px 30px rgba(84,3,9,.7);
 }
 
+.yes:hover {
+  transform: scale(1.1);
+  box-shadow: 0 20px 45px rgba(84,3,9,.9);
+}
+
+.yes:active {
+  transform: scale(1.05);
+}
+
+/* NO BUTTON */
 .no {
   position: fixed;
-  background: #ddd;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid var(--wine);
 }
 
-#successMsg {
-  margin-top: 1.5rem;
-  font-size: 1.5rem;
-  color: #ff4d6d;
+/* CUSTOM ALERT */
+.alert {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14,6,4,.7);
+  z-index: 10;
+}
+
+.alert-box {
+  background: var(--deep);
+  border: 2px solid var(--wine);
+  padding: 2rem 3rem;
+  border-radius: 24px;
+  font-size: 1.6rem;
   animation: pop 0.6s ease;
+  box-shadow: 0 30px 80px rgba(0,0,0,.8);
 }
 
 @keyframes pop {
-  0% { transform: scale(0.7); opacity: 0; }
+  0% { transform: scale(0.6); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* FIREWORKS */
+.firework {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: #ffb3b3;
+  border-radius: 50%;
+  animation: explode 1s ease-out forwards;
+}
+
+@keyframes explode {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+}
 </style>
 </head>
 
 <body>
 
+<video autoplay muted loop playsinline class="bg-video">
+  <source src="valentinovo.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
 <div class="card">
-  <h1>Will you be my Valentine? 💖</h1>
+  <h1>Will you be my Valentine? ❤️</h1>
+
+  <div id="countdown"></div>
 
   <form id="valentineForm">
     <input type="hidden" name="message" value="HE SAID YES 💍">
@@ -74,43 +170,82 @@ button {
   </form>
 
   <button class="no" id="noBtn">NO 💔</button>
-
-  <p id="successMsg" style="display:none;">
-    I knew it 😌💖
-  </p>
 </div>
 
+<!-- CUSTOM ALERT -->
+<div class="alert" id="alert">
+  <div class="alert-box">
+    I knew you love me ❤️
+  </div>
+</div>
 
 <script>
-  const noBtn = document.getElementById("noBtn");
-  const form = document.getElementById("valentineForm");
-  const successMsg = document.getElementById("successMsg");
+/* NO BUTTON ESCAPE */
+const noBtn = document.getElementById("noBtn");
+function moveButton() {
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 60);
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+noBtn.addEventListener("mouseenter", moveButton);
+noBtn.addEventListener("touchstart", moveButton);
 
-  function moveButton() {
-    const x = Math.random() * (window.innerWidth - 120);
-    const y = Math.random() * (window.innerHeight - 60);
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
+/* FORM SUBMIT */
+const form = document.getElementById("valentineForm");
+const alertBox = document.getElementById("alert");
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+
+  fetch("https://formspree.io/f/xpqlnyqo", {
+    method: "POST",
+    headers: { "Accept": "application/json" },
+    body: new FormData(form)
+  }).then(() => {
+    alertBox.style.display = "flex";
+    launchFireworks();
+  });
+});
+
+/* FIREWORKS */
+function launchFireworks() {
+  for (let i = 0; i < 80; i++) {
+    const f = document.createElement("div");
+    f.className = "firework";
+    f.style.left = "50%";
+    f.style.top = "50%";
+    f.style.setProperty("--x", (Math.random() * 600 - 300) + "px");
+    f.style.setProperty("--y", (Math.random() * 600 - 300) + "px");
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 1000);
+  }
+}
+
+/* COUNTDOWN TO VALENTINE */
+const countdownEl = document.getElementById("countdown");
+const valentinesDay = new Date(new Date().getFullYear(), 1, 14);
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = valentinesDay - now;
+
+  if (diff <= 0) {
+    countdownEl.textContent = "It's Valentine’s Day ❤️";
+    return;
   }
 
-  noBtn.addEventListener("mouseenter", moveButton);
-  noBtn.addEventListener("touchstart", moveButton);
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / (1000 * 60)) % 60);
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+  countdownEl.textContent =
+    `${d} days ${h} hours ${m} minutes until Valentine’s Day 💘`;
+}
 
-    fetch("https://formspree.io/f/xpqlnyqo", {
-      method: "POST",
-      headers: { "Accept": "application/json" },
-      body: new FormData(form)
-    }).then(() => {
-      form.style.display = "none";
-      noBtn.style.display = "none";
-      successMsg.style.display = "block";
-    });
-  });
+updateCountdown();
+setInterval(updateCountdown, 60000);
 </script>
-
 
 </body>
 </html>
