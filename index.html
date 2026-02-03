@@ -150,7 +150,7 @@ button {
 </div>
 
 <script>
-// VIDEO SWITCH nakon 5s
+// VIDEO SWITCH nakon 5 sekundi
 const video = document.getElementById("bgVideo");
 setTimeout(() => {
   video.src = "valentinovo2.mp4";
@@ -158,12 +158,16 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-// NO BUTTON LOGIC
+// NO BUTTON LOGIC SA SWEETALERT2
+const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅","Ups 😎"];
+const emojis = ["face.png","face1.png","face2.png","face3.png","face4.png","face5.png"];
+
 const noBtn = document.getElementById("noBtn");
 let clickCount = 0;
 const maxClicks = 5;
 const margin = 10; // minimalni margin od ekrana
 
+// Inicijalna pozicija gumba
 function initNoBtn() {
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
@@ -175,6 +179,7 @@ function initNoBtn() {
   noBtn.style.top = `${margin}px`;
 }
 
+// Funkcija za pomicanje gumba
 function moveNoBtn() {
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
@@ -186,14 +191,29 @@ function moveNoBtn() {
   
   noBtn.style.left = `${newX}px`;
   noBtn.style.top = `${newY}px`;
-  
+
   clickCount++;
-  if(clickCount >= maxClicks){
-    alert("Haha, nisam rekao da možeš kliknuti više 😅");
-    clickCount = 0;
+
+  if (clickCount >= maxClicks) {
+    const msgIndex = Math.floor(Math.random() * messages.length);
+    const emojiIndex = Math.floor(Math.random() * emojis.length);
+    
+    Swal.fire({
+      title: messages[msgIndex],
+      imageUrl: emojis[emojiIndex],
+      imageHeight: 80,
+      imageAlt: "emoji face",
+      showConfirmButton: true,
+      confirmButtonText: "Ok 😊",
+      background: '#2e0606',
+      color: '#ffdada'
+    });
+
+    clickCount = 0; // reset
   }
 }
 
+// Event listeneri za sve vrste interakcija
 noBtn.addEventListener("mouseenter", moveNoBtn);
 noBtn.addEventListener("click", moveNoBtn);
 noBtn.addEventListener("touchstart", moveNoBtn);
