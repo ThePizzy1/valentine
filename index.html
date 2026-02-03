@@ -12,7 +12,7 @@
   --deep: #2e0606;
   --wine: #540309;
   --text: #f5dcdc;
-  --margin: 20px; /* margin from screen edge */
+  --margin: 20px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -87,7 +87,7 @@ button {
 .yes:hover { transform: scale(1.1); }
 
 .no {
-  position: fixed; /* uvijek vidljiv */
+  position: fixed;
   background: rgba(255,255,255,0.15);
   color: white;
   border: 1px solid var(--wine);
@@ -150,7 +150,7 @@ button {
 </div>
 
 <script>
-// VIDEO SWITCH nakon 5 sekundi
+// VIDEO SWITCH nakon 5s
 const video = document.getElementById("bgVideo");
 setTimeout(() => {
   video.src = "valentinovo2.mp4";
@@ -158,46 +158,43 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-// NO BUTTON LOGIC SA SWEETALERT2
+// SWEETALERT2 NO BUTTON
 const messages = ["Neeeee 💔","Ahhh 😱","Stop pls 😢","Nooo 😭","Ne mogu više 😅","Ups 😎"];
-const emojis = ["face.png","face1.png","face2.png","face3.png","face4.png","face5.png"];
+const emojis = [
+  "face.png",
+  "face1.png",
+  "face2.png",
+  "face3.png",
+  "face4.png",
+  "face5.png"
+];
 
 const noBtn = document.getElementById("noBtn");
 let clickCount = 0;
 const maxClicks = 5;
-const margin = 10; // minimalni margin od ekrana
+const margin = 10;
 
-// Inicijalna pozicija gumba
-function initNoBtn() {
-  const btnW = noBtn.offsetWidth;
-  const btnH = noBtn.offsetHeight;
-  const winW = window.innerWidth;
-  const winH = window.innerHeight;
-  
-  noBtn.style.position = "fixed";
-  noBtn.style.left = `${winW - btnW - margin}px`;
-  noBtn.style.top = `${margin}px`;
+function getSafeRandom(max, size, margin){
+  return Math.random() * (max - size - 2*margin) + margin;
 }
 
-// Funkcija za pomicanje gumba
-function moveNoBtn() {
+function moveNoBtn(){
   const btnW = noBtn.offsetWidth;
   const btnH = noBtn.offsetHeight;
   const winW = window.innerWidth;
   const winH = window.innerHeight;
-  
-  const newX = Math.random() * (winW - btnW - 2 * margin) + margin;
-  const newY = Math.random() * (winH - btnH - 2 * margin) + margin;
-  
+
+  const newX = getSafeRandom(winW, btnW, margin);
+  const newY = getSafeRandom(winH, btnH, margin);
+
   noBtn.style.left = `${newX}px`;
   noBtn.style.top = `${newY}px`;
 
   clickCount++;
+  if(clickCount >= maxClicks){
+    const msgIndex = Math.floor(Math.random()*messages.length);
+    const emojiIndex = Math.floor(Math.random()*emojis.length);
 
-  if (clickCount >= maxClicks) {
-    const msgIndex = Math.floor(Math.random() * messages.length);
-    const emojiIndex = Math.floor(Math.random() * emojis.length);
-    
     Swal.fire({
       title: messages[msgIndex],
       imageUrl: emojis[emojiIndex],
@@ -209,15 +206,19 @@ function moveNoBtn() {
       color: '#ffdada'
     });
 
-    clickCount = 0; // reset
+    clickCount = 0;
   }
 }
 
-// Event listeneri za sve vrste interakcija
+function initNoBtn(){
+  requestAnimationFrame(() => {
+    moveNoBtn();
+  });
+}
+
 noBtn.addEventListener("mouseenter", moveNoBtn);
 noBtn.addEventListener("click", moveNoBtn);
 noBtn.addEventListener("touchstart", moveNoBtn);
-
 window.addEventListener("load", initNoBtn);
 window.addEventListener("resize", initNoBtn);
 
