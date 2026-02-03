@@ -137,7 +137,7 @@ h1 {
   <div class="title-box" id="titleBox">
     <h1>Gabi,<br>will you be my Valentine? ❤️</h1>
 
-    <form action="https://formspree.io/f/xpqlnyqo" method="POST">
+    <form id="yesForm" action="https://formspree.io/f/xpqlnyqo" method="POST">
       <input type="hidden" name="message" value="YES 💍">
       <button class="yes" type="submit">YES 💕</button>
     </form>
@@ -163,8 +163,7 @@ setTimeout(() => {
   video.play();
 }, 5000);
 
-// SWEET ALERT DATA
-// SWEET ALERT DATA
+
 const messages = [
   "Krivi gumb",
   "Ajde nemoj tako",
@@ -266,6 +265,43 @@ function updateCountdown() {
 
 updateCountdown();
 setInterval(updateCountdown, 1000);
+const yesForm = document.getElementById("yesForm");
+
+yesForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // 🚫 nema redirecta
+
+  const formData = new FormData(yesForm);
+
+  try {
+    await fetch(yesForm.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    Swal.fire({
+      title: "Hvala ljubavi ❤️",
+      text: "Volim i ja tebe 💕",
+      imageUrl: "face.png", // ili neka posebna slika
+      imageHeight: 100,
+      confirmButtonText: "🥰",
+      background: "#2e0606",
+      color: "#ffdada",
+      confirmButtonColor: "#7a0c14"
+    });
+
+  } catch (err) {
+    Swal.fire({
+      title: "Ups 😬",
+      text: "Nešto nije prošlo, probaj opet",
+      background: "#2e0606",
+      color: "#ffdada"
+    });
+  }
+});
+
 </script>
 
 </body>
